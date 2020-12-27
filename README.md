@@ -1,12 +1,12 @@
 
-# vim tex zathura skim snippets
-- [install mactex, zathura, skim, vim-plug](#install-mactex-zathura-skim-vim-plug)
+# vim and tex
+- [installation](#installation)
 - [configure your .vimrc](#configure-your-vimrc)
 - [configure your skim](#configure-your-skim)
 - [ultisnips for latex](#ultisnips-for-latex)
 
 
-### install mactex, zathura, skim, vim-plug
+### installation
 ```bash
 # install mactex
 # note: need to enter root password
