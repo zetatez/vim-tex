@@ -4,6 +4,8 @@
 - zathura
 - skim
 
+
+- install mactex, zathura, skim, vim-plug
 ```bash
 # install mactex
 # note: need to enter root password
@@ -82,21 +84,17 @@ call plug#end()
 " |   vim-plug end                                     |
 " ------------------------------------------------------
 
-
 " ---
 " --- for tex, open pdf with zathura in current folder
 " ---
 noremap \lp :! zathura *pdf &<CR><CR>
 
 ```
-```bash
-# install plugins 
-vim . << EOF
-:PlugInstall
-:qa
-EOF
-
-```
+- configure your skim
+skim -> preferences -> sync
+- custom
+- vi
+- `--remote-silent +"%line" "%file"`
 
 
 - ultisnips for latex
