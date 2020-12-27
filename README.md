@@ -1,5 +1,5 @@
-
 # vim and tex
+
 - [installation](#installation)
 - [configure your .vimrc](#configure-your-vimrc)
 - [configure your skim](#configure-your-skim)
@@ -106,12 +106,24 @@ vi ~/.config/ultisnips/tex.snippets
 # -----------------------------
 # tex
 
+# -----------------------------------------
+global !p
+texMathZones = ['texMathZone' + x for x in ['A', 'AS', 'B', 'BS', 'C', 'CS', 'D', 'DS', 'E', 'ES', 'F', 'FS', 'G', 'GS', 'H', 'HS', 'I', 'IS', 'J', 'JS', 'K', 'KS', 'L', 'LS', 'DS', 'V', 'W', 'X', 'Y', 'Z', 'AmsA', 'AmsB', 'AmsC', 'AmsD', 'AmsE', 'AmsF', 'AmsG', 'AmsAS', 'AmsBS', 'AmsCS', 'AmsDS', 'AmsES', 'AmsFS', 'AmsGS' ]]
+texIgnoreMathZones = ['texMathText']
+texMathZoneIds = vim.eval('map('+str(texMathZones)+", 'hlID(v:val)')")
+texIgnoreMathZoneIds = vim.eval('map('+str(texIgnoreMathZones)+", 'hlID(v:val)')")
+ignore = texIgnoreMathZoneIds[0]
+def math():
+    synstackids = vim.eval("synstack(line('.'), col('.') - (col('.')>=2 ? 1 : 0))")
+    try:
+        first = next(i for i in reversed(synstackids) if i in texIgnoreMathZoneIds or i in texMathZoneIds)
+        return first != ignore
+    except StopIteration:
+        return False
+endglobal
+
 # basic
 # -----------------------------------------
-snippet law "law"
-S_{T}=S_{0}\int_T e^{r(t)}du
-endsnippet
-
 snippet parts "parts" bwA
 \part{${1:part 1}}$0
 \part{${2:part 2}}
@@ -175,15 +187,20 @@ endsnippet
 
 snippet 'begin list' "begin end" bwA
 \begin{${1:itemize|enumerate|description}}[noitemsep]
-	\item ${2:item 1}$0
-	\item ${3:item 2}
-	\item ${4:item 3}
+    \item ${2:item 1}$0
+    \item ${3:item 2}
+    \item ${4:item 3}
 \end{$1}
 endsnippet
 
+
 # math
 # -----------------------------------------
-# inline math 
+context "math()"
+snippet law "law"
+S_{T}=S_{0}\int_T e^{r(t)}du
+endsnippet
+
 snippet mk "math" wA
 $${1}$`!p
 if t[2] and t[2][0] not in [',', '.', '?', '-', ' ']:
@@ -193,22 +210,27 @@ else:
 `$2
 endsnippet
 
-# display math
 snippet dm "math" wA
 \[
 $1
 \] $0
 endsnippet
 
-# fractions
-# priority 1
+context "math()"
 snippet / "fraction" i
 \\frac{${VISUAL}}{$1}$0
 endsnippet
 
-# //      ->  \frac{}{}
+context "math()"
 snippet // "fraction" iA
 \\frac{$1}{$2}$0
+endsnippet
+
+# //      ->  \frac{}{}
+
+context "math()"
+snippet '([\w\*\^\_\\\%\!]+|\([^(\)]+\)|\[[^\[\]]+\]|\\frac\{.*\}\{.*\}|\{[^(\\frac\{.*\}\{.*\})]*\})/' "fraction" wrA
+\\frac{`!p snip.rv = match.group(1)`}{$1}$0
 endsnippet
 
 # 3/      ->  \frac{3}{}
@@ -216,11 +238,8 @@ endsnippet
 # (1 + 2 + 3)/  ->  \frac{1 + 2 + 3}{}
 # (1+(2+3)/)  ->  (1 + \frac{2+3}{})
 # (1 + (2+3))/  ->  \frac{1 + (2+3)}{}
-snippet '([\w\*\^\_\\\%\!]+|\([^(\)]+\)|\[[^\[\]]+\]|\\frac\{.*\}\{.*\}|\{[^(\\frac\{.*\}\{.*\})]*\})/' "fraction" wrA
-\\frac{`!p snip.rv = match.group(1)`}{$1}$0
-endsnippet
 
-# you can use it by first select­ing some text, then pressing Tab, typing / and pressing Tab again
+context "math()"
 snippet '^.*\)/' "() fraction" wr
 `!p
 stripped = match.string[:-1]
@@ -235,29 +254,35 @@ snip.rv = stripped[0:i] + "\\frac{" + stripped[i+1:-1] + "}"
 `{$1}$0
 endsnippet
 
-# sub and supscript
+# you can use it by first select­ing some text, then pressing Tab, typing / and pressing Tab again
+
+context "math()"
 snippet '([A-Za-z])(\d)' "auto subscript" wr
 `!p snip.rv = match.group(1)`_`!p snip.rv = match.group(2)`
 endsnippet
 
-# auto subcript
-# type x1_12324 tap -> x1_{1234} .
+context "math()"
 snippet '([A-Za-z0-9])_([\S]+) ' "auto subscript 1" wrA
 `!p snip.rv = match.group(1)`_{`!p snip.rv = match.group(2).strip()`} 
 endsnippet
 
-# auto subscript
-# type x1^12324 tap -> x1^{1234} .
+# type x1_12324 tap -> x1_{1234} .
+
+context "math()"
 snippet '([A-Za-z0-9])\^([\S]+) ' "auto supscript 1" wrA
 `!p snip.rv = match.group(1)`^{`!p snip.rv = match.group(2).strip()`} 
 endsnippet
 
-# sympy and mathematica
-# sympy Tab expands to sympy | sympy, and sympy 1 + 1 sympy Tab expands to 2
+# type x1^12324 tap -> x1^{1234} .
+
+context "math()"
 snippet sympy "sympy block " w
 sympy $1 sympy$0
 endsnippet
 
+# sympy Tab expands to sympy | sympy, and sympy 1 + 1 sympy Tab expands to 2
+
+context "math()"
 snippet 'sym(.*)sym' "evaluate sympy" wr
 `!p
 from sympy import *
@@ -272,76 +297,93 @@ snip.rv = eval('latex(' + match.group(1).replace('\\', '') \
 `
 endsnippet
 
-snippet '(\#|\$|\%|\^|\&|\_|\{|\}|\~|\\)\\' "reserved characters" rwA
-\\`!p snip.rv = match.group(1)`
-endsnippet
-
-# alphabet: Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Omicron|Pi|Rho|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega
-# alphabet: alpha|beta|gamma|delta|epsilon|zet|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega
-# alphabet: varepsilon|vartheta|varkappa|varpi|varrho|varsigma|varphi
-# math    : imath|hbar|ell|mho|Re|Im|aleph|wp
-# newline : clearpage|pagebreak
-# function: max|min|sup|inf|limsup|liminf|ker|exp|lg|deg|Pr|det|hom|arg|dim|infty|infty
-# triangle: sin|cos|tan|sec|csc|cot|arcsin|arccos|arctan|sinh|cosh|tanh
-# sets    : forall/exists/empty/emptyset/varnothing/in/ni/notin/subset/subseteq/supset/supseteq/cap/bigcap/cup/bigcup/biguplus/sqsubset/susubseteq/sqsupset/sqsupseteq/sqcap/sqcup/bigsqcup/sum/prod/coprod
-# logic   : lnot|land|lor|lneg|wedge|bigwedge|vee|bigvee|smallsetminus|iff|iff
-# special noations: oplus|bigoplus|otimes|bigotimes|bigodot|boxplus|boxtimes|times|div|ciro|cdot|bullet|dots|cdots|vdots|ddots|nabala|triangle|Box|Diamond|diamondsuit|heartsuit
-# reserved characters: copyright|vfill|hfill
-snippet '(Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Omicron|Pi|Rho|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega|alpha|beta|gamma|delta|epsilon|zet|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|varepsilon|vartheta|varkappa|varpi|varrho|varsigma|varphi|imath|hbar|ell|mho|Re|Im|aleph|wp|clearpage|pagebreak|max|min|sup|inf|limsup|liminf|ker|exp|lg|deg|Pr|det|hom|arg|dim|infty|sin|cos|tan|sec|csc|cot|arcsin|arccos|arctan|sinh|cosh|tanh|forall|exists|empty|emptyset|varnothing|inn|ni|notin|subset|subseteq|supset|supseteq|cap|bigcap|cup|bigcup|biguplus|sqsubset|susubseteq|sqsupset|sqsupseteq|sqcap|sqcup|bigsqcup|sum|prod|coprod|lnot|land|lor|lneg|wedge|bigwedge|vee|bigvee|smallsetminus|iff|setminus|oplus|bigoplus|otimes|bigotimes|bigodot|boxplus|boxtimes|times|div|ciro|cdot|bullet|dots|cdots|vdots|ddots|nabala|triangle|Box|Diamond|diamondsuit|heartsuit|copyright|vfill|hfill) ' "functions" rwA
+context "math()"
+snippet '(Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Omicron|Pi|Rho|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega|alpha|beta|gamma|delta|epsilon|zet|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega|varepsilon|vartheta|varkappa|varpi|varrho|varsigma|varphi|imath|hbar|ell|mho|Re|Im|aleph|wp|clearpage|pagebreak|max|min|sup|inf|limsup|liminf|ker|exp|lg|deg|Pr|det|hom|arg|dim|infty|sin|cos|tan|sec|csc|cot|arcsin|arccos|arctan|sinh|cosh|tanh|forall|exists|empty|emptyset|varnothing|inn|ni|notin|subset|subseteq|supset|supseteq|cap|bigcap|cup|bigcup|biguplus|sqsubset|susubseteq|sqsupset|sqsupseteq|sqcap|sqcup|bigsqcup|sum|prod|coprod|lnot|land|lor|lneg|wedge|bigwedge|vee|bigvee|smallsetminus|iff|setminus|oplus|bigoplus|otimes|bigotimes|bigodot|boxplus|boxtimes|times|div|ciro|cdot|bullet|dots|cdots|vdots|ddots|nabala|triangle|Box|Diamond|diamondsuit|heartsuit|copyright|vfill|hfill|\#|\$|\%|\^|\&|\_|\{|\}|\~|\\) ' "functions" rwA
 `!p snip.rv = '\\' + match.group(1) + ' '`$0
 endsnippet
 
+# Alpha|Beta|Gamma|Delta|Epsilon|Zeta|Eta|Theta|Iota|Kappa|Lambda|Mu|Nu|Xi|Omicron|Pi|Rho|Sigma|Tau|Upsilon|Phi|Chi|Psi|Omega
+# alpha|beta|gamma|delta|epsilon|zet|eta|theta|iota|kappa|lambda|mu|nu|xi|omicron|pi|rho|sigma|tau|upsilon|phi|chi|psi|omega
+# varepsilon|vartheta|varkappa|varpi|varrho|varsigma|varphi
+# imath|hbar|ell|mho|Re|Im|aleph|wp
+# clearpage|pagebreak
+# max|min|sup|inf|limsup|liminf|ker|exp|lg|deg|Pr|det|hom|arg|dim|infty|infty
+# sin|cos|tan|sec|csc|cot|arcsin|arccos|arctan|sinh|cosh|tanh
+# forall/exists/empty/emptyset/varnothing/in/ni/notin/subset/subseteq/supset/supseteq/cap/bigcap/cup/bigcup/biguplus/sqsubset/susubseteq/sqsupset/sqsupseteq/sqcap/sqcup/bigsqcup/sum/prod/coprod
+# lnot|land|lor|lneg|wedge|bigwedge|vee|bigvee|smallsetminus|iff|iff
+# oplus|bigoplus|otimes|bigotimes|bigodot|boxplus|boxtimes|times|div|ciro|cdot|bullet|dots|cdots|vdots|ddots|nabala|triangle|Box|Diamond|diamondsuit|heartsuit
+# copyright|vfill|hfill
+# \#|\$|\%|\^|\&|\_|\{|\}|\~|\\
+
+context "math()"
 snippet lim "lim" iw
 \lim_{n=1}^{n=\infty} $0
 endsnippet
 
+context "math()"
 snippet lims "limsup" iwA
 \limsup $0
 endsnippet
 
+context "math()"
 snippet limi "liminf" iwA
 \liminf $0
 endsnippet
 
+context "math()"
 snippet int "integral" iw
 \int_{${1:-\infty}}^{${2:\infty}} ${3:${VISUAL}} $0
 endsnippet
 
+context "math()"
 snippet 'log ([\w]+) ([\w]+) ' "log_a b" rwA
 `!p snip.rv = '\\log_' + '{' + match.group(1) + '} ' + match.group(2)`$0
 endsnippet
 
-# text: title|textsubscript|textsupscript
-# font text: \textrm\textsf\texttt\textmd\textbf\textup\textit\textsl\textsc\emph
 snippet '(title|textsubscript|textsupscript|textrm|textsf|texttt|textmd|textbf|textup|textit|textsl|textsc|emph) ([^\.]+)\.' "math" rwA
 `!p snip.rv = '\\' + match.group(1) + '{' + match.group(2) + '} '`$0
 endsnippet
 
-# tone: bar|acute|check|grave|breve|hat|tilde|vec|dot|ddot|partial
+# title\textsubscript\textsupscript
+# \textrm\textsf\texttt\textmd\textbf\textup\textit\textsl\textsc\emph
+
+context "math()"
+snippet '(mathnormal|mathbb|mathbf|mathrm|mathit|mathtt|mathcal|mathrak|boldsymbol) ([\S]+) ' "math font" rwA
+`!p snip.rv = '\\' + match.group(1) + '{' + match.group(2) + '} '`$0
+endsnippet
+
+# \mathnormal\mathbb\mathbf\mathrm\mathit\mathtt\mathcal\mathrak\boldsymbol
+
+context "math()"
 snippet '(bar|acute|check|grave|breve|hat|tilde|vec|dot|ddot|partial) ([\S]+) ' "å" rwA
 `!p snip.rv = '\\' + match.group(1) + ' ' + match.group(2) + ' '`
 endsnippet
 
-# font size: \tiny\scriptsize\footnotesize\small\normalsize\large\Large\LARGE\huge\Huge
-snippet '(tiny|scriptsize|footnotesize|small|normalsize|large|Large|LARGE|huge|Huge)\.([^\.]+)\. ' "color" rwA
+# \bar\acute\check\grave\breve\hat\tilde\vec\dot\ddot\partial
+
+context "math()"
+snippet '(tiny|scriptsize|footnotesize|small|normalsize|large|Large|LARGE|huge|Huge)\.([^\.]+)\. ' "font size" rwA
 `!p snip.rv = '\{\\' + match.group(1) + ' ' + match.group(2) + '\} '`$0
 endsnippet
 
-# font math: mathnormal/mathbb/mathbf/mathrm/mathit/mathtt/mathcal/mathrak/boldsymbol
-snippet '(mathnormal|mathbb|mathbf|mathrm|mathit|mathtt|mathcal|mathrak|boldsymbol) ([\S]+) ' "math" rwA
-`!p snip.rv = '\\' + match.group(1) + '{' + match.group(2) + '} '`$0
+# \tiny\scriptsize\footnotesize\small\normalsize\large\Large\LARGE\huge\Huge
+
+context "math()"
+snippet 'color\.(\w+)\.([^\.]+)\.' "color" rwA
+`!p snip.rv = '{\\color' + '{' + match.group(1) + '} ' + match.group(2) + '} '`$0
 endsnippet
 
-# mod: pmod/bmod
+context "math()"
 snippet 'pmod ([\w]+) ' "mod(m)" rwA
 `!p snip.rv = '\\pmod{' + match.group(1) + '}'`$0
 endsnippet
 
+context "math()"
 snippet '([\S]+) bmod ([\S]+)' "a mod b" rwA
 `!p snip.rv = match.group(1) + ' \\bmod ' + match.group(1)`$0
 endsnippet
 
-# sqrt:sqrt/sqrt[n]
+context "math()"
 snippet 'sqrt ([\S]+) ([\S]+) ' "sqrt" rwA
 `!p
 if match.group(1) == '2':
@@ -351,22 +393,26 @@ else:
 `$0
 endsnippet
 
-# color
-snippet 'color\.(\w+)\.([^\.]+)\.' "color" rwA
-`!p snip.rv = '{\\color' + '{' + match.group(1) + '} ' + match.group(2) + '} '`$0
-endsnippet
-
-# arrow
+context "math()"
 snippet '(left|right|liftright|longleft|longright|longleftright|hockleft|hockright|up|down|updown|ne|se|sw|nw|Left|Right|Liftright|Leftright|Longleft|Longright|Longleftright|Up|Down|Updown) arrow ' "arrow" rwA
 `!p snip.rv = '\\' + match.group(1) + 'arrow' + ' '`$0
 endsnippet
 
+context "math()"
 snippet '(to|gets|mapsto|longmapsto)\.' "to gets mapsto longmapsto" rwA
 `!p snip.rv = '\\' + match.group(1) + ' '`$0
 endsnippet
 
+context "math()"
 snippet '(left|right|up|down)\.(left|right|up|down)' "harpoon" rwA
 `!p snip.rv = '\\' + match.group(1) + 'harpoon' + match.group(2) `$0
+endsnippet
+
+context "math()"
+snippet "(\[|\(|\{|\<|\.|\||\\)(\]|\)|\}|\>|\.|\||\\)([^\.]+)\." "parenthesis" rwA
+`!p
+snip.rv = '\\left' + match.group(1) + ' ' + match.group(3) + ' \\right ' + match.group(2)
+`$0
 endsnippet
 
 # []something.-> \left[ something \right]
@@ -374,30 +420,30 @@ endsnippet
 # {}something.-> \left{ something \right}
 # <>something.-> \left< something \right>
 # [.something.-> \left[ something \right.
-snippet "(\[|\(|\{|\<|\.|\||\\)(\]|\)|\}|\>|\.|\||\\)([^\.]+)\." "parenthesis" rwA
-`!p
-snip.rv = '\\left' + match.group(1) + ' ' + match.group(3) + ' \\right ' + match.group(2)
-`$0
-endsnippet
 
+context "math()"
 snippet "(ceil|floor|angle)([^\.]+)\." "parenthesis" rwA
 `!p
 snip.rv = '\\left \\l' + match.group(1) + ' ' + match.group(2) + ' \\right \\r' + match.group(1)
 `$0
 endsnippet
 
+context "math()"
 snippet () "left( right)" iA
 \left( ${1:${VISUAL}} \right) $0
 endsnippet
 
+context "math()"
 snippet {} "left{ right}" i
 \left\\{ ${1:${VISUAL}} \right\\} $0
 endsnippet
 
+context "math()"
 snippet || "left| right|" i
 \left| ${1:${VISUAL}} \right| $0
 endsnippet
 
+context "math()"
 snippet <> "leftangle rightangle" iA
 \left<${1:${VISUAL}} \right>$0
 endsnippet
@@ -409,74 +455,92 @@ snippet bbox "box"
 $0
 endsnippet
 
+context "math()"
 snippet pmat "pmat" iA
 \begin{pmatrix} $1 \end{pmatrix} $0
 endsnippet
 
+context "math()"
 snippet bmat "bmat" iA
 \begin{bmatrix} $1 \end{bmatrix} $0
 endsnippet
 
+context "math()"
 snippet conj "conjugate" iA
 \overline{$1}$0
 endsnippet
 
+context "math()"
 snippet sum "sum" w
 \sum_{n=${1:1}}^{${2:\infty}} ${3:a_n z^n}
 endsnippet
 
+context "math()"
 snippet taylor "taylor" w
 \sum_{${1:k}=${2:0}}^{${3:\infty}} ${4:c_$1} (x-a)^$1 $0
 endsnippet
 
+context "math()"
 snippet prod "product" w
 \prod_{${1:n=${2:1}}}^{${3:\infty}} ${4:${VISUAL}} $0
 endsnippet
 
+context "math()"
 snippet __ "subscript" iA
 _{$1}$0
 endsnippet
 
+context "math()"
 snippet ^^ "subscript" iA
 ^{$1}$0
 endsnippet
 
+context "math()"
 snippet ooo "\infty" iA
 \infty
 endsnippet
 
+context "math()"
 snippet xx "cross" iA
 \times 
 endsnippet
 
+context "math()"
 snippet ** "cdot" iA
 \cdot 
 endsnippet
 
+context "math()"
 snippet normm "norm" iA
 \|$1\|$0
 endsnippet
 
+context "math()"
 snippet invv "inverse" iA
 ^{-1}
 endsnippet
 
+context "math()"
 snippet comm "complement" iA
 ^{c}
 endsnippet
 
+context "math()"
 snippet tt "text" iA
 \text{$1}$0
 endsnippet
 
+context "math()"
 snippet vecc "v vector" iA
 \begin{pmatrix} ${1:x}_${2:1}\\\\ \vdots\\\\ $1_${2:n} \end{pmatrix}
 endsnippet
 
+context "math()"
 snippet r0+ "R0+" iA
 \\R_0^+
 endsnippet
 
+context "math()"
 snippet r0- "R0-" iA
 \\R_0^-
 endsnippet
@@ -487,12 +551,12 @@ endsnippet
 # -----------------------------------------
 snippet table "table environment" b
 \begin{table}[${1:htpb}]
-	\centering
-	\caption{${2:caption}}
-	\label{tab:${3:label}}
-	\begin{tabular}{${5:c}}
-	$0${5/((?<=.)c|l|r)|./(?1: & )/g}
-	\end{tabular}
+    \centering
+    \caption{${2:caption}}
+    \label{tab:${3:label}}
+    \begin{tabular}{${5:c}}
+    $0${5/((?<=.)c|l|r)|./(?1: & )/g}
+    \end{tabular}
 \end{table}
 endsnippet
 
@@ -500,10 +564,10 @@ endsnippet
 # -----------------------------------------
 snippet fig "figure environment" b
 \begin{figure}[${1:htpb}]
-	\centering
-	${2:\includegraphics[width=0.8\textwidth]{$3}}
-	\caption{${4:$3}}
-	\label{fig:${5:${3/\W+/-/g}}}
+    \centering
+    ${2:\includegraphics[width=0.8\textwidth]{$3}}
+    \caption{${4:$3}}
+    \label{fig:${5:${3/\W+/-/g}}}
 \end{figure}
 endsnippet
 
@@ -511,18 +575,18 @@ endsnippet
 # -----------------------------------------
 snippet plot "plot" w
 \begin{figure}[$1]
-	\centering
-	\begin{tikzpicture}
-		\begin{axis}[
-			xmin= ${2:-10}, xmax= ${3:10},
-			ymin= ${4:-10}, ymax = ${5:10},
-			axis lines = middle,
-		]
-			\addplot[domain=$2:$3, samples=${6:100}]{$7};
-		\end{axis}
-	\end{tikzpicture}
-	\caption{$8}
-	\label{${9:$8}}
+    \centering
+    \begin{tikzpicture}
+        \begin{axis}[
+            xmin= ${2:-10}, xmax= ${3:10},
+            ymin= ${4:-10}, ymax = ${5:10},
+            axis lines = middle,
+        ]
+            \addplot[domain=$2:$3, samples=${6:100}]{$7};
+        \end{axis}
+    \end{tikzpicture}
+    \caption{$8}
+    \label{${9:$8}}
 \end{figure}
 endsnippet
 
@@ -868,7 +932,5 @@ beamer goes here
 
 \end{document}
 endsnippet
-
-# -----------------------------
 
 ```
