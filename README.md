@@ -1,8 +1,14 @@
+
 # vim and latex 
-- vim
-- tex
-- zathura
-- skim
+    - vim
+    - tex
+    - zathura
+    - skim
+
+- [install mactex, zathura, skim, vim-plug](#install-mactex-zathura-skim-vim-plug)
+- [configure your .vimrc](#configure-your-vimrc)
+- [configure your skim](#configure-your-skim)
+- [ultisnips for latex](#ultisnips-for-latex)
 
 
 ### install mactex, zathura, skim, vim-plug
