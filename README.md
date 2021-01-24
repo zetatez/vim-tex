@@ -7,18 +7,12 @@
 ### 1. Installation
 ```bash
 brew install --cask mactex-no-gui &
-brew cask install skim &
 brew tap zegervdv/zathura &
 brew install xdotool &
 brew install zathura &
 brew install zathura-pdf-poppler &
+brew cask install skim &
 wait
- 
-mkdir -p $(brew --prefix zathura)/lib/zathura
-ln -s $(brew --prefix zathura-pdf-poppler)/libpdf-poppler.dylib $(brew --prefix zathura)/lib/zathura/libpdf-poppler.dylib
-
-mkdir -p ~/.config/zathura
-echo "set selection-clipboard clipboard" > ~/.config/zathura/zathurarc
 
 # vim-plug
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
@@ -83,13 +77,22 @@ call plug#end()
 noremap \lp :! zathura *pdf &<CR><CR>
 ```
 
-### 3. Ultisnips !!!
+### 3. Ultisnips !!
 ```bash
 mkdir -p ~/.config/ultisnips
 curl -fsSL https://raw.githubusercontent.com/zetatez/vim-tex/main/tex.snippets > ~/.config/ultisnips/tex.snippets
 ```
 
-### 4. Configure your skim
+### 4. Configure zathura
+```bash
+mkdir -p $(brew --prefix zathura)/lib/zathura
+ln -s $(brew --prefix zathura-pdf-poppler)/libpdf-poppler.dylib $(brew --prefix zathura)/lib/zathura/libpdf-poppler.dylib
+
+mkdir -p ~/.config/zathura
+echo "set selection-clipboard clipboard" > ~/.config/zathura/zathurarc
+```
+
+### 4. Configure skim
 skim -> preferences -> sync
     - custom
     - vi
