@@ -1,8 +1,8 @@
 # vim and tex
-- [1.Installation](#1installation)
-- [2.Configure your .vimrc](#2configure-your-vimrc)
-- [3.Ultisnips !!!](#3ultisnips-)
-- [4.Configure your skim](#4configure-your-skim)
+- [1. Installation](#1-installation)
+- [2. Configure your .vimrc](#2-configure-your-vimrc)
+- [3. Ultisnips !!!](#3-ultisnips-)
+- [4. Configure your skim](#4-configure-your-skim)
 
 ### 1. Installation
 ```bash
