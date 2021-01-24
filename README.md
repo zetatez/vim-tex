@@ -6,19 +6,12 @@
 
 ### 1.Installation
 ```bash
-# Install mactex
-# Note: need to enter root password
 brew install --cask mactex-no-gui &
-
-# Install zathura
+brew cask install skim &
 brew tap zegervdv/zathura &
 brew install xdotool &
 brew install zathura &
 brew install zathura-pdf-poppler &
-
-# Install skim
-brew cask install skim &
-
 wait
  
 mkdir -p $(brew --prefix zathura)/lib/zathura
@@ -27,7 +20,7 @@ ln -s $(brew --prefix zathura-pdf-poppler)/libpdf-poppler.dylib $(brew --prefix 
 mkdir -p ~/.config/zathura
 echo "set selection-clipboard clipboard" > ~/.config/zathura/zathurarc
 
-# Install vim-plug
+# vim-plug
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 ```
 
