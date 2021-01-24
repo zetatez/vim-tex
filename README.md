@@ -35,21 +35,21 @@ call plug#begin('~/.vim/plugged')
 
 """"""
 """""" snippets
-Plug 'SirVer/ultisnips'                                                 " ultimate snippet
+Plug 'SirVer/ultisnips'
 " Trigger configuration. You need to change this to something other than <\> if you use one of the following:
 " - https://github.com/Valloric/YouCompleteMe
 " - https://github.com/nvim-lua/completion-nvim
 let g:UltiSnipsExpandTrigger = '<tab>'
 let g:UltiSnipsJumpForwardTrigger = '<c-j>'
 let g:UltiSnipsJumpBackwardTrigger = '<c-k>'
-let g:UltiSnipsEditSplit='vertical'                                     " If you want :UltiSnipsEdit to split your window
+let g:UltiSnipsEditSplit='vertical'
 let g:UltiSnipsSnippetDirectories = ['~/.config/ultisnips']
 
-Plug 'honza/vim-snippets'                                               " snippets are separated from the engine
+Plug 'honza/vim-snippets'
 
 """"""
 """""" tex
-Plug 'lervag/vimtex'                                                    " latex
+Plug 'lervag/vimtex'
 let g:tex_flavor='latex'
 let g:vimtex_view_method='skim'
 let g:vimtex_quickfix_mode=0
@@ -83,26 +83,16 @@ call plug#end()
 noremap \lp :! zathura *pdf &<CR><CR>
 ```
 
-- issue
-```bash
-# install vim plugs
-vim . << EOF
-:PlugInstall
-EOF
-```
-
 ### 3. Ultisnips !!!
 ```bash
 mkdir -p ~/.config/ultisnips
-
 curl -fsSL https://raw.githubusercontent.com/zetatez/vim-tex/main/tex.snippets > ~/.config/ultisnips/tex.snippets
 ```
 
 ### 4. Configure your skim
 skim -> preferences -> sync
-- custom
-- vi
-- `--remote-silent +"%line" "%file"`
-
+    - custom
+    - vi
+    - `--remote-silent +"%line" "%file"`
 
 
