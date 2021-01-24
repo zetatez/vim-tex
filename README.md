@@ -4,7 +4,7 @@
 - [3.Ultisnips !!!](#3ultisnips-)
 - [4.Configure your skim](#4configure-your-skim)
 
-### 1.Installation
+### 1. Installation
 ```bash
 brew install --cask mactex-no-gui &
 brew cask install skim &
@@ -24,7 +24,7 @@ echo "set selection-clipboard clipboard" > ~/.config/zathura/zathurarc
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
 ```
 
-### 2.Configure your .vimrc
+### 2. Configure your .vimrc
 ```vim
 " ------------------------------------------------------
 " |   vim-plug start                                   |
@@ -91,14 +91,14 @@ vim . << EOF
 EOF
 ```
 
-### 3.Ultisnips !!!
+### 3. Ultisnips !!!
 ```bash
 mkdir -p ~/.config/ultisnips
 
 curl -fsSL https://raw.githubusercontent.com/zetatez/vim-tex/main/tex.snippets > ~/.config/ultisnips/tex.snippets
 ```
 
-### 4.Configure your skim
+### 4. Configure your skim
 skim -> preferences -> sync
 - custom
 - vi
