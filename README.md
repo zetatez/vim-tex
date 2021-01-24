@@ -12,10 +12,11 @@ brew install xdotool &
 brew install zathura &
 brew install zathura-pdf-poppler &
 brew cask install skim &
-wait
 
 # vim-plug
 curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+wait
 ```
 
 ### 2. Configure your .vimrc
